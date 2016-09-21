@@ -1,6 +1,10 @@
 <?php
-namespace Lib\Queue;
-
+/**
+ * 
+ * 
+ * Create a background shell process free of the shell, non-blocking background process
+ * 
+ */
 class BgProcess{
 	
 	/**
@@ -17,18 +21,11 @@ class BgProcess{
 	
 	/**
 	 * 
-	 * @var Logger
-	 */
-	protected $_loggerKey;
-
-	/**
-	 * 
 	 * @param string $arg0, $arg1 ...
 	 * $arg0 is location of php file to run
 	 * $arg1 ..is additional params to send to script
 	 */
 	public function __construct($arg0){
-		$this->_loggerKey = basename(__CLASS__);
 		
 		if(stripos(php_uname('s'), 'win') > -1){
 			$this->_osWin = true;
@@ -38,7 +35,7 @@ class BgProcess{
 		
 		$args = func_get_args();
 		if(empty($args)){
-			throw new QueueException(__CLASS__.' arguments required', QueueException::ER_INVALID_DATA_TYPE );
+			throw new Exception(__CLASS__.' arguments required' );
 		}
 		
 		$file = str_replace('\\', '/', array_shift($args));
@@ -50,22 +47,14 @@ class BgProcess{
 				$cmd = 'cmd /C '.$phpPath.' '.$script;
 				$oExec = $WshShell->Run($cmd, 0, false);
 			}else{
-				//> /dev/null &
-				//$cmd = $phpPath.' -f '.$script.' ';
 				$cmd = $phpPath.' -f '.$script.' > /dev/null &';
-				
-				
 				exec($cmd, $oExec);
 			}
 			
 			$this->_comand = $cmd;
-			//	$message = $this->_logger->format(__CLASS__, __METHOD__, 'RUNNING[ '.$this->_comand.' ]');
-			//	$this->_logger->log($message);
+
 		}else{
-			$Logger = new Logger($this->_loggerKey);
-			$message = $Logger->format(__CLASS__, __METHOD__, 'Could not find php executable');
-			$Logger->log($message);
-			unset($Logger);
+			throw new Exception( 'Could not find php executable' );
 		}
 	}
 	

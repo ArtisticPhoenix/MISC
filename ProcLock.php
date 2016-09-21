@@ -1,8 +1,4 @@
 <?php
-namespace Lib\Queue;
-
-use Lib\FileSystem\FileSystem;
-use Lib\FileSystem\FileSystemConfig;
 /*
  CLASS Lock
  Description - Process locker
@@ -30,18 +26,11 @@ class ProcLock{
 	 */
 	protected static $_pid;  
 	
-	
 	/**
-	 *
-	 * @var QueueConfig
+	 * path to place .lock files
+	 * @var string
 	 */
-	protected static $_queueConfig;  
-	
-	/**
-	 *
-	 * @var Logger
-	 */
-	protected static $_loggerKey;  
+	protected static $_lockPath; 
 	
 	/**
 	 * 
@@ -49,8 +38,9 @@ class ProcLock{
 	 * @param int $pid
 	 */
 	public function __construct(){	
-		self::$_loggerKey = basename(__CLASS__);
-		self::$_queueConfig = QueueConfig::getInstance();
+		if(self::$_lockPath){
+			self::$_lockPath = str_replace('\\','/', __DIR__).'/';
+		}
 	}
 	
 	/**
@@ -58,7 +48,7 @@ class ProcLock{
 	 * this is not essential as we check this when getting a new lock - but it looks better to clean them up.
 	 */
 	public function cleanDeadLocks(){
-		$path = self::$_queueConfig->get('path', 'locks');
+		$path = self::$_lockPath;
 		$contents = array_diff(scandir( $path ), array('.','..'));
 		
 		foreach ( $contents as $filename ){
@@ -77,7 +67,7 @@ class ProcLock{
 	 * @return string
 	 */
 	public function getLockFilename($key){
-		return self::$_queueConfig->get('path', 'locks').preg_replace('/^(.+?)(\.lock)?$/', '\1.lock', $key);
+		return self::$_lockPath.preg_replace('/^(.+?)(\.lock)?$/', '\1.lock', $key);
 	}
 	
 	/**
@@ -110,7 +100,7 @@ class ProcLock{
 				self::$_pid = $pid;
 				return true;
 			}else{
-				throw new QueueException('[ '.$filename.' ]', QueueException::ER_LOCK);
+				throw new Exception('Lock Error[ '.$filename.' ]');
 			}
 		}
 		return false;
@@ -122,7 +112,6 @@ class ProcLock{
 	 * @return boolean
 	 */
 	public function unlock(){
-		print_rr(__METHOD__);
 		if( $this->hasLock() === true ){
 			$filename = $this->getLockFilename( self::$_key );
 			if(!file_exists($filename) || unlink($filename)){
@@ -130,7 +119,7 @@ class ProcLock{
 				self::$_pid = null;
 				return true;
 			}else{
-				throw new QueueException('[ '.$filename.' ]', QueueException::ER_UNLOCK);
+				throw new Exception('Unlock Error[ '.$filename.' ]');
 			}
 		}
 		return false;
@@ -160,21 +149,21 @@ class ProcLock{
 	public function lastAccess(){
 		if(!$this->hasLock()){
 			//should never happen unless improperly called
-			throw new QueueException('before calling '.__METHOD__.'()', QueueException::ER_LOCK_FIRST);
+			throw new Exception('Create lock before calling '.__METHOD__.'()');
 		}
 	
 		$lockFile = $this->getLockFilename(self::$_key);
 	
 		if(!file_exists($lockFile) || !is_file($lockFile)){
 			//no lock file
-			throw new QueueException('[ '.$lockFile.' ]', QueueException::ER_FILE_NOT_EXISTS);
+			throw new Exception('Missing Lock file[ '.$lockFile.' ]');
 		}
 
 		
 		$processPid = $this->getPidFromLockFile(self::$_key);
 		
 		if(self::$_pid != $processPid){
-			throw new QueueException('[ '.self::$_pid.' != '.$processPid.' ]', QueueException::ER_LOCK_PID_MISSMATCH);
+			throw new Exception('Lock PID missmatch[ '.self::$_pid.' != '.$processPid.' ]');
 			//process id missmatch
 		}
 		
@@ -186,7 +175,7 @@ class ProcLock{
 	protected function _validatePid( $pid ){
 		$task = false;
 		$pid = intval($pid);
-		print_rr(self::$_pid . ' = ' . $pid );
+	
 		if(stripos(php_uname('s'), 'win') > -1){
 			$task = shell_exec("tasklist /fi \"PID eq {$pid}\"");
 			/*
@@ -213,14 +202,13 @@ class ProcLock{
 			'
 			*/
 		}
-		//print_rr( $task );
-		//print_rr( $task );
+
 		if($task){
 			return ( preg_match('/php|httpd/', $task) ) ? true : false;
 		}
 		
 			
-		throw new QueueException('task pid detection failed [ '.$pid.' ]', QueueException::ER_INVALID_DATA_TYPE);
+		throw new Exception('task pid detection failed [ '.$pid.' ]');
 		
 	}
 	

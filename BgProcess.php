@@ -24,6 +24,9 @@ class BgProcess{
 	 * @param string $arg0, $arg1 ...
 	 * $arg0 is location of php file to run
 	 * $arg1 ..is additional params to send to script
+	 * 
+	 * eg.  new BgProcess( '/home/cli_scripts/script.php', 'true', 'false' );
+	 * 
 	 */
 	public function __construct($arg0){
 		
@@ -39,7 +42,7 @@ class BgProcess{
 		}
 		
 		$file = str_replace('\\', '/', array_shift($args));
-		$script = escapeshellarg($file).' '.escapeshellarg(implode('/', $args));
+		$script = escapeshellarg($file).' '.implode(' ', array_map('escapeshellarg', $args));
 		if(false !== ($phpPath = $this->_getPHPExecutableFromPath())){
 
 			if($this->_osWin){	

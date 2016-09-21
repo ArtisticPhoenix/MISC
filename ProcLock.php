@@ -144,7 +144,7 @@ class ProcLock{
 	
 	/**
 	 *
-	 * @return boolean
+	 * @return int last time file was touched
 	 */
 	public function lastAccess(){
 		if(!$this->hasLock()){
@@ -213,7 +213,7 @@ class ProcLock{
 	}
 	
 	/**
-	 * 
+	 * will update the lock time if a lock file exists.
 	 * @return boolean
 	 */
 	public function canLock($key){

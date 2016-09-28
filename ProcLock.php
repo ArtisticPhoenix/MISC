@@ -198,7 +198,7 @@ class ProcLock{
 			*/
 			/*
 			 '  PID TTY      STAT   TIME COMMAND
-			4298 ?        S      0:00 /usr/bin/php /home/webrecom/dev/public_html/clients/index.php
+			4298 ?        S      0:00 /usr/bin/php /home/dev/public_html/clients/index.php
 			'
 			*/
 		}

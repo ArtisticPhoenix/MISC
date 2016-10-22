@@ -244,18 +244,7 @@ final class ProcLock{
 			/*
 			 '  PID TTY      STAT   TIME COMMAND
 				'
-				*/
-			/*
-			 '  PID TTY      STAT   TIME COMMAND
-<<<<<<< HEAD
-				4298 ?        S      0:00 /usr/bin/php /home/webrecom/dev/public_html/clients/index.php
-				'
-				*/
-=======
-			4298 ?        S      0:00 /usr/bin/php /home/dev/public_html/clients/index.php
-			'
 			*/
->>>>>>> refs/remotes/origin/master
 		}
 			
 		//print_rr( $task );
@@ -286,8 +275,5 @@ final class ProcLock{
  * register our shutdown handler - if the script dies unlock the lock
  * this is superior to __destruct(), because the shutdown handler runs even in situation where PHP exhausts all memory
  */
-<<<<<<< HEAD
-register_shutdown_function(array('\\'.ProcLock::class, "destroy"));
-=======
 register_shutdown_function(array('\\Lib\\Queue\\ProcLock',"destroy"));
->>>>>>> refs/remotes/origin/master
+

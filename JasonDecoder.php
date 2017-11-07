@@ -108,6 +108,8 @@ function parseJsonTokens( array &$lexer_stream ){
     trigger_error("Unclosed item $mode for $type value $content", E_USER_ERROR);
 }
 
+//https://stackoverflow.com/questions/2934563/how-to-decode-unicode-escape-sequences-like-u00ed-to-proper-utf-8-encoded-cha
+
 function replace_unicode_escape_sequence($match) {
     return mb_convert_encoding(pack('H*', $match[1]), 'UTF-8', 'UCS-2BE');
 }

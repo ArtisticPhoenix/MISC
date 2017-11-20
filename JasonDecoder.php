@@ -75,7 +75,11 @@ function parseJsonTokens( array &$lexer_stream ){
                 next($lexer_stream);//consume a token
                 break;
             case 'T_ENCAP_STRING':
-                $value .= unicode_decode($content); //encapsulated strings are always content
+                 if( $mode == 'key'){
+                    $key .= trim($content,'"');
+                }else{
+                    $value .= unicode_decode($content); //encapsulated strings are always content
+                }
                 next($lexer_stream);//consume a token
                 break;
             case 'T_COMMA':  //comma ends an item
@@ -119,7 +123,7 @@ function unicode_decode($str) {
 }
 
 $str = '{
-    party:"bases",
+    "party":"bases",
     number:"1",
     id:"xx_3039366",
     url:"systen01-ny.com",
@@ -176,7 +180,7 @@ print_r( parseJson($str, $tokens) );
     [id] => "xx_3039366"
     [url] => "systen01-ny.com"
     [target] => "_self"
-    [address] => "Ch„o as Alminhas-Medas,Uteiros de Gatos e Fontes Longaq<br/>64320-761 ANHADOS LdA"
+    [address] => "Ch√£o as Alminhas-Medas,Uteiros de Gatos e Fontes Longaq<br/>64320-761 ANHADOS LdA"
     [coordinate] => Array
         (
             [x] => 90.995262145996094
@@ -190,17 +194,17 @@ print_r( parseJson($str, $tokens) );
             [fax] => "xxxx 777 235"
             [c2c] => !0
         )
-    [parameters] => "Flex Am·vel Silva,hal,,EN_30336,S,786657,1,0,"
-    [text] => "Vila Nova de Loz CÙa,os melhores vinhos, v·rias. Produtor/exportador/comÈrcio"
+    [parameters] => "Flex Am√°vel Silva,hal,,EN_30336,S,786657,1,0,"
+    [text] => "Vila Nova de Loz C√¥a,os melhores vinhos, v√°rias. Produtor/exportador/com√©rcio"
     [website] => null
     [mail] => ""
     [listing] => "paid"
     [pCode] => "64"
-    [name] => "xpto Am·vel Costa"
+    [name] => "xpto Am√°vel Costa"
     [logo] => Array
         (
             [src] => "http://ny.test.gif"
-            [altname] => "xpto Am·vel Costa"
+            [altname] => "xpto Am√°vel Costa"
         )
     [bookingUrl] => ""
     [ipUrl] => ""

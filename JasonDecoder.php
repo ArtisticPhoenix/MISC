@@ -11,14 +11,11 @@ function parseJson($subject, $tokens)
     $types = array_keys($tokens);
     $patterns = [];
     $lexer_stream = [];
-
     $result = false;
-
     foreach ($tokens as $k=>$v){
         $patterns[] = "(?P<$k>$v)";
     }
     $pattern = "/".implode('|', $patterns)."/i";
-
     if (preg_match_all($pattern, $subject, $matches, PREG_OFFSET_CAPTURE)) {
         //print_r($matches);
         foreach ($matches[0] as $key => $value) {
@@ -29,35 +26,26 @@ function parseJson($subject, $tokens)
                     break;
                 }
             }
-
             $tok  = [
                 'content' => $match[0],
                 'type' => $type,
                 'offset' => $match[1]
             ];
-
             $lexer_stream[] = $tok;
         }
-
         $result = parseJsonTokens( $lexer_stream );
     }
     return $result;
 }
-
 function parseJsonTokens( array &$lexer_stream ){
-
     $result = [];
-
     next($lexer_stream); //advnace one
     $mode = 'key'; //items start in key mode  ( key => value )
-
     $key = '';
     $value = '';
-
     while($current = current($lexer_stream)){
         $content = $current['content'];
         $type = $current['type'];
-
         switch($type){
             case 'T_WHITESPACE'://ignore whitespace
                 next($lexer_stream);
@@ -75,7 +63,7 @@ function parseJsonTokens( array &$lexer_stream ){
                 next($lexer_stream);//consume a token
                 break;
             case 'T_ENCAP_STRING':
-                 if( $mode == 'key'){
+                if( $mode == 'key'){
                     $key .= trim($content,'"');
                 }else{
                     $value .= unicode_decode($content); //encapsulated strings are always content
@@ -100,28 +88,52 @@ function parseJsonTokens( array &$lexer_stream ){
                 next($lexer_stream);//consume a token
                 return $result;
                 break;
+            case 'T_OPEN_BRACKET': //start of a sub-block  
+                next($lexer_stream);//consume a token
+                $value = array();
+                $v='';
+                while($current = current($lexer_stream)){
+                    $content = $current['content'];
+                    $type = $current['type'];
+                    switch($type){
+                        case 'T_WHITESPACE'://ignore whitespace
+                            next($lexer_stream);
+                        break;
+                        case 'T_STRING':
+                        case 'T_ENCAP_STRING':
+                            $v .= $content;
+                             next($lexer_stream);
+                        break;
+                        case 'T_COMMA':
+                            $value[] = $v;
+                            $v ='';
+                             next($lexer_stream);
+                        break;   
+                        case 'T_CLOSE_BRACKET':
+                            next($lexer_stream);
+                        break 2;
+                        default:
+                            print_r($current);
+                            trigger_error("Unknown token $type value $content", E_USER_ERROR);
+                    }
+                }
+            break;
             default:
                 print_r($current);
                 trigger_error("Unknown token $type value $content", E_USER_ERROR);
         }
-
     }
-
     if( !$current ) return;
     print_r($current);
     trigger_error("Unclosed item $mode for $type value $content", E_USER_ERROR);
 }
-
 //https://stackoverflow.com/questions/2934563/how-to-decode-unicode-escape-sequences-like-u00ed-to-proper-utf-8-encoded-cha
-
 function replace_unicode_escape_sequence($match) {
     return mb_convert_encoding(pack('H*', $match[1]), 'UTF-8', 'UCS-2BE');
 }
-
 function unicode_decode($str) {
     return preg_replace_callback('/\\\\u([0-9a-f]{4})/i', 'replace_unicode_escape_sequence', $str);
 }
-
 $str = '{
     "party":"bases",
     number:"1",
@@ -155,12 +167,19 @@ $str = '{
     customerId:"7657",
     addressId:"98760",
     combined:null,
-    showReviews:!0
+    showReviews:!0,
+    array: [
+     1,
+     2,
+     3,
+     4
+    ]
 }';
-
 $tokens = [
     'T_OPEN_BRACE'      => '\{',
     'T_CLOSE_BRACE'     => '\}',
+    'T_OPEN_BRACKET'      => '\[',
+    'T_CLOSE_BRACKET'     => '\]',
     'T_ENCAP_STRING'    => '\".*?(?<!\\\\)\"',
     'T_COLON'           => ':',
     'T_COMMA'           => ',',
@@ -168,9 +187,7 @@ $tokens = [
     'T_WHITESPACE'      => '[\r\n\s\t]+',
     'T_UNKNOWN'         => '.+?'
 ];
-
 print_r( parseJson($str, $tokens) );
-
 //OUPUTS
 /*
  Array
@@ -213,5 +230,14 @@ print_r( parseJson($str, $tokens) );
     [addressId] => "98760"
     [combined] => null
     [showReviews] => !0
+    [array] => Array
+        (
+            [0] => 1
+            [1] => 2
+            [2] => 3
+        )
+
 )
+
+http://sandbox.onlinephpfunctions.com/code/94b0e7421a8d873f3c26638186b3d25a2b9a009f
  */

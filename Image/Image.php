@@ -1,6 +1,7 @@
 <?php
 
 require __DIR__.'/ImageException.php';
+
 /**
  * @author artisticphoenix
  * @subpackage Image

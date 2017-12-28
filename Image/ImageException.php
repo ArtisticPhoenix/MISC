@@ -1,8 +1,9 @@
 <?php
 
+
 /**
- * @author hughdurham
- * @package Lib
+ * @author artisticphoenix
+
  * @subpackage Image
  *
 */

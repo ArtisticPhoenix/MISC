@@ -2,8 +2,7 @@
 
 require __DIR__.'/ImageException.php';
 /**
- * @author hughdurham
- * @package Lib
+ * @author artisticphoenix
  * @subpackage Image
  *
  */
@@ -234,6 +233,7 @@ Class Image{
 		$height = $this->height() * $ratio;
 		$this->resize($width, $height);
 	}
+	
 
 	/**
 	 * resize image by width and height (stretch)

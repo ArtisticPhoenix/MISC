@@ -24,9 +24,7 @@ class SimpleRouter{
     const CONTOLLER_PATH = __DIR__.'/Controllers/';
     
     /**
-     * simple router
-     * 
-     * schema 
+     * route a url to a controller
      */
     public static function route(){
         //normalize

@@ -30,7 +30,10 @@ class SimpleRouter{
      */
     public static function route(){
         //normalize
-        $uri = preg_replace('~^'.self::REWRITE_BASE.'~i', '',$_SERVER['REQUEST_URI']);
+        if(self::REWRITE_BASE != '/'){
+            $uri = preg_replace('~^'.self::REWRITE_BASE.'~i', '',$_SERVER['REQUEST_URI']);
+        }
+        
         $uri = preg_replace('~^index\.php~i', '',$uri);      
         $uri = trim($uri,'/');
         

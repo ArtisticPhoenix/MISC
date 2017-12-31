@@ -1,5 +1,4 @@
 <?php
-
 /**
  * A simple 1 level router
  * 

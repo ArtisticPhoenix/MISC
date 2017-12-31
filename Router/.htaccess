@@ -1,0 +1,11 @@
+<IfModule mod_rewrite.c>
+	  RewriteEngine On
+	# For sub-foder installs set your RewriteBase including trailing and leading slashes
+ 
+    # your rewrite base will vary, possibly even being / if no sub-foder are involved
+	RewriteBase /MISC/Router/
+    
+	RewriteCond %{REQUEST_FILENAME} !-f
+	RewriteCond %{REQUEST_FILENAME} !-d
+	RewriteRule ^(.*)$ index.php/$1 [L]
+</IfModule>

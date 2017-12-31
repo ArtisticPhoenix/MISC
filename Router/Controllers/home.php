@@ -1,6 +1,12 @@
 <?php
 
-
+/**
+ * 
+ * The default controller
+ * 
+ * @author ArtisticPhoenix
+ * @package SimpleRouter
+ */
 class home{
     
     public function index($arg=false){

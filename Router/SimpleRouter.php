@@ -1,6 +1,13 @@
 <?php
 
-
+/**
+ * A simple 1 level router
+ * 
+ * URL schema is http://example.com/{controller}/{method}/{args ... }
+ * 
+ * @author ArtisticPhoenix
+ * @package SimpleRouter
+ */
 class SimpleRouter{
     
     /**
@@ -9,6 +16,11 @@ class SimpleRouter{
      */
     const REWRITE_BASE = '/MISC/Router/';
     
+    /**
+     * path to controller files
+     * 
+     * @var string
+     */
     const CONTOLLER_PATH = __DIR__.'/Controllers/';
     
     /**
@@ -37,18 +49,21 @@ class SimpleRouter{
         if(!file_exists($contollerFile)){
             //send to error page
             self::error404($uri);
+            return;
         }
         
         require_once $contollerFile;
         
         if(!class_exists($contollerName)){
             self::error404($uri);
+            return;
         }
         
         $Controller = new $contollerName();
         
         if(!method_exists($Controller, $methodName)){
             self::error404($uri);
+            return;
         }
         
         if(!count($arrPath)){
@@ -57,15 +72,15 @@ class SimpleRouter{
             call_user_func_array([$Controller, $methodName], $arrPath);
         } 
     }
-    
-    
+ 
+    /**
+     * call error 404
+     * 
+     * @param string $uri
+     */
     protected static function error404($uri){
         require_once self::CONTOLLER_PATH.'home.php';     
         $Controller = new home();
         $Controller->error404($uri);
-        exit();
     }
-    
-    
-    
 }

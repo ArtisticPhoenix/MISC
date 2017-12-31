@@ -1,6 +1,12 @@
 <?php
 
-
+/**
+ *
+ * An example users router
+ *
+ * @author ArtisticPhoenix
+ * @package SimpleRouter
+ */
 class user{
     
     public function index(){

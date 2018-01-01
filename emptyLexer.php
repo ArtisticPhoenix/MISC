@@ -88,16 +88,16 @@ function parse_array(array &$lexer_stream){
     }
 }
 
+/**
+ * token should be "name" => "regx"
+ * 
+ * Order is important
+ * 
+ * @var array $tokens
+ */
 $tokens = [
-    'T_OPEN_BRACE'      => '\{',
-    'T_CLOSE_BRACE'     => '\}',
-    'T_OPEN_BRACKET'      => '\[',
-    'T_CLOSE_BRACKET'     => '\]',
-    'T_ENCAP_STRING'    => '\".*?(?<!\\\\)\"',
-    'T_COLON'           => ':',
-    'T_COMMA'           => ',',
-    'T_STRING'          => '[-a-z0-9_.!]+',
-    'T_WHITESPACE'      => '[\r\n\s\t]+',
+
+    'T_EOF'             => '\Z',
     'T_UNKNOWN'         => '.+?'
 ];
 

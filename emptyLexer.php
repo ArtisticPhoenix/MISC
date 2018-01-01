@@ -5,7 +5,7 @@ error_reporting(-1);
 ini_set('display_errors', 1);
 echo "<pre>";
 
-function parseJson($subject, $tokens)
+function parse($subject, $tokens)
 {
     $types = array_keys($tokens);
     $patterns = [];

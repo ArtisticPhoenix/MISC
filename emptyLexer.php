@@ -5,7 +5,7 @@ error_reporting(-1);
 ini_set('display_errors', 1);
 echo "<pre>";
 
-function parse($subject, $tokens)
+function parseJson($subject, $tokens)
 {
     $types = array_keys($tokens);
     $patterns = [];
@@ -61,7 +61,6 @@ function parse_array(array &$lexer_stream){
         $type = $current['type'];
         switch($type){
             case 'T_EOF':
-                
             return;
             case 'T_UNKNOWN':
             default:

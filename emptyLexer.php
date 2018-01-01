@@ -60,27 +60,10 @@ function parse_array(array &$lexer_stream){
         $content = $current['content'];
         $type = $current['type'];
         switch($type){
-            case 'T_WHITESPACE'://ignore whitespace
-                next($lexer_stream);
-            break;
-            case 'T_STRING':
-            case 'T_ENCAP_STRING':
-                $v .= $content;
-                 next($lexer_stream);
-            break;
-            case 'T_COMMA':
-                $value[] = $v;
-                $v ='';
-                 next($lexer_stream);
-            break;   
-            case 'T_OPEN_BRACKET':
-                next($lexer_stream);
-                $value[] = parse_array($lexer_stream); //recursive
-            break;
-            case 'T_CLOSE_BRACKET':
-                if(!empty($v)) $value[] = $v;
-                next($lexer_stream);
-                return $value;
+            case 'T_EOF':
+                
+            return;
+            case 'T_UNKNOWN':
             default:
                 print_r($current);
                 trigger_error("Unknown token $type value $content", E_USER_ERROR);

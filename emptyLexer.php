@@ -43,6 +43,9 @@ function parseTokens( array &$lexer_stream ){
         $content = $current['content'];
         $type = $current['type'];
         switch($type){
+            case 'T_EOF': return;
+            
+            case 'T_UNKNOWN':
             default:
                 print_r($current);
                 trigger_error("Unknown token $type value $content", E_USER_ERROR);

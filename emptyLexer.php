@@ -64,7 +64,6 @@ function parseTokens( array &$lexer_stream ){
  * @var array $tokens
  */
 $tokens = [
-
     'T_EOF'             => '\Z',
     'T_UNKNOWN'         => '.+?'
 ];

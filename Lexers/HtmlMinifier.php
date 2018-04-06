@@ -39,13 +39,14 @@ class Minifier{
      * @var array
      */
     protected $tokens =  [
-        'T_EOF'             => '\Z',
+        'T_EOF'             => '\Z',                   //matches end of string
+        'T_COMMENT'         => '<(?=!--).+(?<=--)>',   //matches only <!-- comment -->
         'T_OPEN_TAG'        => '<(?!\/)[^>]+(?<!\/)>', //matches only <tag ... >
         'T_CLOSE_TAG'       => '<(?=\/)[^>]+(?<!\/)>', //matches only </tag ..>
         'T_INLINE_TAG'      => '<(?!\/)[^>]+(?<=\/)>', //matches only <tag ... />
-        'T_STRING'          => '[-\w]+', //matches 0-9a-z
-        'T_WHITESPACE'      => '\s+',
-        'T_UNKNOWN'         => '.+?'
+        'T_STRING'          => '[-\w]+',               //matches -0-9a-z
+        'T_WHITESPACE'      => '\s+',                  //matches \s\t\r\n
+        'T_UNKNOWN'         => '.+?'                   //matches everything else 
     ];
     
     /**
@@ -113,7 +114,7 @@ class Minifier{
         foreach ($this->tokens as $k=>$v){
             $patterns[] = "(?P<$k>$v)";
         }
-        $pattern = "/".implode('|', $patterns)."/i";
+        $pattern = "/".implode('|', $patterns)."/is";
         if (preg_match_all($pattern, $html, $matches, PREG_OFFSET_CAPTURE)) {
             //print_r($matches);
             foreach ($matches[0] as $key => $value) {
@@ -154,6 +155,9 @@ class Minifier{
             
             next($token_stream);
             switch($type){  
+                case 'T_COMMENT':
+                    //remove comments
+                break;
                 case 'T_OPEN_TAG':
                     if(strlen($string)){
                         //add trimmed string to result, reset string.
@@ -164,6 +168,8 @@ class Minifier{
                         }
                         $string = '';
                     }
+                    //clean
+                    $content = $this->cleanTag($content);
                     
                     if($this->isIgnoredTag($content)){
                         //indicate ignore whitespace
@@ -172,7 +178,7 @@ class Minifier{
                         //indicate a tag is open
                         $mode = 'open';
                     }
-                    $result .= $this->cleanTag($content);
+                    $result .= $content;
                 break;
                 case 'T_INLINE_TAG':
                 case 'T_CLOSE_TAG':  
@@ -185,8 +191,10 @@ class Minifier{
                         }
                         $string = '';
                     }
+                    //clean
+                    $content = $this->cleanTag($content);
                     //add content to result
-                    $result .= $this->cleanTag($content);
+                    $result .= $content;
                     //indicate a tag is closed
                     $mode = 'closed';               
                 break;  
@@ -236,20 +244,34 @@ class Minifier{
      */
     protected function cleanTag($tag)
     {
-        return preg_replace('/\s{2,}/', ' ', $tag);
+        return preg_replace([
+            '/\s{2,}/',            
+            '/^<\s+/',
+            '/^<\/\s+/',
+            '/\s+>$/',
+            '/\s\/>$/'
+         ],[
+            ' ',
+            '<',
+            '</',
+            '>',
+            '/>',
+         ], $tag);
     }
     
     /**
      * 
-     * @param string $ignoreTags
+     * should be cleand with cleanTag first.
+     * 
+     * @param string $htmlTag
      * @param array $ignoreTags
      * @throws Exception
      * @return boolean
      */
-    protected function isIgnoredTag($ignoreTags)
+    protected function isIgnoredTag($htmlTag)
     {
-        if(!preg_match('/<([a-z]+)\b/i', $ignoreTags, $tagName))
-            throw new Exception("Cound not parse HTML tag name $tag", 1000);
+        if(!preg_match('/<\/?([a-z]+)\b/i', $htmlTag, $tagName))
+            throw new Exception("Cound not parse HTML tag name $htmlTag", 1000);
        return in_array($tagName[1],$this->ignoreTags);
     }
 }
@@ -268,9 +290,18 @@ $html = <<<HTML
 }
 </style>
 <p>
-This is a stupid p tag
+This is
+            a
+stupid p tag
+            that has
+    all     kinds   of  extra   space   in  it.
 </p>
-<form class="some class other another"         >
+<   span  id="foo"  >Insert title<  /    span    ><!-- extra space in this tag, comments are removed -->
+<
+br
+><!-- new line tag -->
+<br  /  ><!-- spaced inline tag -->
+<form class="some class other another"> 
     <div class="title-box">
         <div class="title">Questions</div>
     </div>

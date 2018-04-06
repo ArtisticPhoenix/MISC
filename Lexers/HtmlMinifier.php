@@ -53,9 +53,11 @@ class Minifier{
     /**
      * 
      * @param mixed $ignoreTags
+     * @param mixed $removeTags
      */
-    public function __construct($ignoreTags = ''){
-        $this->setTag($ignoreTags);
+    public function __construct($addTags = [], $removeTags = []){
+        $this->unsetTag($removeTags);
+        $this->setTag($addTags);
     }
     
     /**
@@ -87,8 +89,9 @@ class Minifier{
      */
     public function unsetTag($ignoreTags)
     {
-        $index = array_search($ignoreTags, $this->ignoreTags);
-        if(false !== $index) unset($this->ignoreTags[$index]);
+        if(empty($ignoreTags)) return;
+        if(!is_array($ignoreTags)) $ignoreTags = [$ignoreTags];
+        $this->ignoreTags = array_diff($this->ignoreTags, $ignoreTags);
     }
     /**
      * 

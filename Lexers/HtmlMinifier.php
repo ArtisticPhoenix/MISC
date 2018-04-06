@@ -39,14 +39,15 @@ class Minifier{
      * @var array
      */
     protected $tokens =  [
-        'T_EOF'             => '\Z',                   //matches end of string
-        'T_COMMENT'         => '<(?=!--).+(?<=--)>',   //matches only <!-- comment -->
-        'T_OPEN_TAG'        => '<(?!\/)[^>]+(?<!\/)>', //matches only <tag ... >
-        'T_CLOSE_TAG'       => '<(?=\/)[^>]+(?<!\/)>', //matches only </tag ..>
-        'T_INLINE_TAG'      => '<(?!\/)[^>]+(?<=\/)>', //matches only <tag ... />
-        'T_STRING'          => '[-\w]+',               //matches -0-9a-z
-        'T_WHITESPACE'      => '\s+',                  //matches \s\t\r\n
-        'T_UNKNOWN'         => '.+?'                   //matches everything else 
+        'T_EOF'             => '\Z',                            //matches end of string
+        'T_COMMENT'         => '<(?=!--).+(?<=--)>',            //matches only <!-- comment -->
+        'T_OPEN_TAG'        => '<(?!\/)[^>]+(?<!\/)>',          //matches only <tag ... >
+        'T_CLOSE_TAG'       => '<(?=\/)[^>]+(?<!\/)>',          //matches only </tag ..>
+        'T_INLINE_TAG'      => '<(?!\/)[^>]+(?<=\/)>',          //matches only <tag ... />
+        'T_ENCAPSED_STRING' => '(?P<Q>\'|").*?(?<!\\\\)\k<Q>',   //matches  "foo\"bar" or 'foo\'bar'
+        'T_STRING'          => '[-\w]+',                        //matches -0-9a-z
+        'T_WHITESPACE'      => '\s+',                           //matches \s\t\r\n
+        'T_UNKNOWN'         => '.+?'                            //matches everything else 
     ];
     
     /**
@@ -198,11 +199,13 @@ class Minifier{
                     //indicate a tag is closed
                     $mode = 'closed';               
                 break;  
+                case 'T_ENCAPSED_STRING':
                 case 'T_STRING':
                 case 'T_UNKNOWN':
                     switch ($mode){
                         case 'ignore':
                         case 'open':
+                        case 'closed':
                             //add content to string (not result)
                             $string .= $content;
                         break;
@@ -339,6 +342,8 @@ another line...</textarea>
 <script type="text/javascript">
 (function($){
     $(document).ready(function(){
+        var div = "<div>foobar</div>";
+        var span = '<span>span</span>';
         $('textarea[name="bio"]').focuus();
         $(form).on('submit', function(e){
             e.preventDefault();

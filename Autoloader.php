@@ -5,14 +5,14 @@
  *
  * For license information please view the LICENSE file included with this source code.
  *
- * PSR4 combatable Autoloader
+ * PSR4 compatable Autoloader
  * 
  * @author ArtisticPhoenix
  * @see http://www.php-fig.org/psr/psr-4/
  * 
  * @example
  * $Autoloader = Autoloader::getInstance();
- * //loks in includes for folder named /includes/Lib/Auth/User/
+ * //looks in includes for folder named /includes/Lib/Auth/User/
  * $Autoloader->regesterPath('Lib\\Auth\\User', __DIR__.'/includes/');
  *
  */

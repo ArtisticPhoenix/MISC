@@ -5,7 +5,7 @@
  *
  * For license information please view the LICENSE file included with this source code.
  *
- * PSR4 compatable Autoloader
+ * PSR4 compatible Autoloader
  * 
  * @author ArtisticPhoenix
  * @see http://www.php-fig.org/psr/psr-4/

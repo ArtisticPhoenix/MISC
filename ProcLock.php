@@ -22,7 +22,45 @@
  
  This class is static for the simple fact that locking is done per-proces, so there is no need 
  to ever have duplate ProcLocks within the same process
- ---------------------------------------------------------------
+	 ---------------------------------------------------------------
+	Example (simple):
+	<?php
+	$lockfile = __DIR__.'/mycronjob.lock';
+
+	//throws and Excption (Code ALREADY_LOCKED = 2004)
+	ProcLock::canLock($lockfile);
+
+	//if you are here, canLock did not throw an exception
+
+	ProcLock::lock($lockfile);
+
+	//...other code
+
+	ProcLock::unlock($lockfile);
+	  ---------------------------------------------------------------
+	Example (complex - long running process):
+	//in this case cron will act as a heartbeat, evertime canLock is called 
+	//the filetime is updated, we can check this time to see if cron is still running.
+
+	<?php
+	$lockfile = __DIR__.'/mycronjob.lock';
+	$expire = (60*2); //2min - time to expire if cron is turned off. 
+
+	ProcLock::setLockFile($lockfile);
+	//throws and Excption (Code ALREADY_LOCKED = 2004)
+	ProcLock::canLock();
+
+	//if you are here, canLock did not throw an exception
+
+	ProcLock::lock();
+
+	while(true){
+		//if current time - the time cron last ran is greater then the timeout, then exit the loop.
+		if(time() - ProcLock::getLastAccess() > $expire) break;
+	}
+	//...other code
+
+	ProcLock::unlock($lockfile);
  */
 final class ProcLock{
 	

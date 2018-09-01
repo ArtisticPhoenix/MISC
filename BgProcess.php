@@ -4,6 +4,8 @@
  * 
  * Create a background shell process free of the shell, non-blocking background process
  * 
+ * @Class COM{}
+ * 
  */
 class BgProcess{
 	

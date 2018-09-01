@@ -10,16 +10,16 @@
  * obviously it will run better from the CL
  *
  * Command line Arguments
- * php "{path}/sql_splitter/index.php" "input" "table" "extract"
+ * php "{path}/extract_table/index.php" "input" "table" "extract"
  * extract can be a pipe seperated list "structure|data|index" 
  *
  * Http Arguments (or you can use the simple web from for submission)
- * http://localhost/sql_splitter?filename=test.sql&table=sometable&extract[]=structure&extract[]=index
+ * http://localhost/extract_table?filename=test.sql&table=sometable&extract[]=structure&extract[]=index
  *
  * In both cases (cli or http) you can also set these constants to manually override the dynamic inputs
  * OVERRIDE_FILENAME, OVERRIDE_TABLE, OVERRIDE_EXTRACT 
  * like the CLI extract can be pipe seperated or an array in PHP7+ 
- * 
+ * @todo: add support for multiple tables
 */
 error_reporting(-1);
 ini_set('display_errors', 1);
@@ -76,9 +76,9 @@ $showHtml = true;
 
 if (IS_CLI) {
 	//Command line mode
-	//php "{path}/sql_splitter/index.php"
-	//php "{path}/sql_splitter/index.php" "filename" "table" "extract"
-	///php "{path}/sql_splitter/index.php"
+	//php "{path}/extract_table/index.php"
+	//php "{path}/extract_table/index.php" "filename" "table" "extract"
+	///php "{path}/extract_table/index.php"
 	
 	$showHtml = false; //never show HTML form
 	
@@ -91,8 +91,8 @@ if (IS_CLI) {
 	
 }else{
 	//HTTP mode
-	//http://localhost/sql_splitter
-	//http://localhost/sql_splitter?filename=test.sql&table=sometable&extract[]=structure&extract[]=index&extract[]=data
+	//http://localhost/extract_table
+	//http://localhost/extract_table?filename=test.sql&table=sometable&extract[]=structure&extract[]=index&extract[]=data
 	
 	$filename = defined('OVERRIDE_FILENAME') ? OVERRIDE_FILENAME : !empty($_GET['filename']) ? $_GET['filename'] : false;
 	$table = defined('OVERRIDE_TABLE') ? OVERRIDE_TABLE : !empty($_GET['table']) ? $_GET['table'] : false;

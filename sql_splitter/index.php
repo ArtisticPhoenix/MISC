@@ -5,7 +5,6 @@
  *
  * For license information please view the LICENSE file included with this source code.
  *
- * 
  * This script can take a large MySQL dump file and extract a single table from it
  * It can be used either from the CLI (command line), or from HTTP:
  * obviously it will run better from the CL

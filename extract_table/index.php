@@ -8,6 +8,7 @@
  * This script can take a large MySQL dump file and extract a single table from it
  * It can be used either from the CLI (command line), or from HTTP:
  * obviously it will run better from the CL
+ * I even tested it with a 36GB sql dump file :)
  *
  * Command line Arguments
  * php "{path}/extract_table/index.php" "input" "table" "extract"

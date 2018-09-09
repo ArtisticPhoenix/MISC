@@ -70,7 +70,7 @@ class AjaxWrapper{
         if(!defined(__CLASS__.'::ENV_'.strtoupper($env))){
             throw new Exception('Unknown enviroment please use one of the '.__CLASS__.'::ENV_* constants instead.');
         }
-        $this->environment = $env;
+        static::$environment = $env;
     }
     
     /**
@@ -115,7 +115,7 @@ class AjaxWrapper{
              //clear any nested output buffers
              $debug .= ob_get_clean();
          }
-         if($this->environment == static::ENV_DEVELOPMENT){
+         if(static::environment == static::ENV_DEVELOPMENT){
              //prevents leaking data in production
               $response['debug'] = $debug;
          }

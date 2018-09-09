@@ -1,5 +1,43 @@
 <?php
-
+/**
+ *
+ * (c) 2016 ArtisticPhoenix
+ *
+ * For license information please view the LICENSE file included with this source code.
+ *
+ * Ajax Wrapper
+ * 
+ * @author ArtisticPhoenix
+ * 
+ * 
+ * @example
+ * 
+ * <b>Javascript</b>
+ * $.post(url, {}, function(data){
+ * 
+ *          if(data.error){
+ *              alert(data.error);
+ *              return;
+ *          }else if(data.debug){          
+ *              alert(data.debug);
+ *          }
+ *          
+ * 
+ * });
+ * 
+ *
+ * <b>PHP</p>
+ * //put into devlopment mode (so it will include debug data)
+ * AjaxWrapper::setEnviroment(AjaxWrapper::ENV_DEVELOPMENT);
+ * 
+ * //wrap code in the Wrapper (wrap on wrap of it's the wrapper)
+ * AjaxWrapper::respond(function(&$response){
+ *     echo "hello World"
+ *     Your code goes here
+ *     $response['success'] = true;
+ * });
+ *
+ */
 class AjaxWrapper{
     
     /**
@@ -35,8 +73,19 @@ class AjaxWrapper{
         $this->environment = $env;
     }
     
-    public static function respond($callback, $options=0, $depth=32){
-        $result = ['userdata' => [
+    /**
+     * 
+     * @param closure $callback - a callback with your code in it
+     * @param number $options - json_encode arg 2
+     * @param number $depth - json_encode arg 3
+     * @throws Exception
+     * 
+     * @example
+     * 
+     * 
+     */
+    public static function respond(Closure $callback, $options=0, $depth=32){
+        $response = ['userdata' => [
               'debug' => false,
               'error' => false
         ]];
@@ -50,14 +99,14 @@ class AjaxWrapper{
                 throw new Exception('Callback is not callable');
              }
 
-             $callback($result);
+             $callback($response);
          }catch(\Exception $e){
               //example 'Exception[code:401]'
-             $result['userdata']['error'] = get_class($e).'[code:'.$e->getCode().']';
+             $response['error'] = get_class($e).'[code:'.$e->getCode().']';
             if(static::$environment == ENV_DEVELOPMENT){
             //prevents leaking data in production
-                $result['userdata']['error'] .= ' '.$e->getMessage();
-                $result['userdata']['error'] .= PHP_EOL.$e->getTraceAsString();
+                $response['error'] .= ' '.$e->getMessage();
+                $response['error'] .= PHP_EOL.$e->getTraceAsString();
             }
          }
 
@@ -66,18 +115,27 @@ class AjaxWrapper{
              //clear any nested output buffers
              $debug .= ob_get_clean();
          }
-         if($this->environment == self::ENV_DEVELOPMENT){
+         if($this->environment == static::ENV_DEVELOPMENT){
              //prevents leaking data in production
-              $result['userdata']['debug'] = $debug;
+              $response['debug'] = $debug;
          }
          header('Content-Type: application/json');
-         echo self::jsonEncode($result, $options, $depth);
+         echo static::jsonEncode($response, $options, $depth);
    }
 
-   public static function jsonEncode($result, $options=0, $depth=32){
-       $json = json_encode($result, $options, $depth);
+   /**
+    * common Json wrapper to catch json encode errors
+    * 
+    * @param array $response
+    * @param number $options
+    * @param number $depth
+    * @return string
+    */
+   public static function jsonEncode(array $response, $options=0, $depth=32){
+       $json = json_encode($response, $options, $depth);
        if(JSON_ERROR_NONE !== json_last_error()){
-           //debug is not passed in this case, because you cannot be sure that, that was not what caused the error.  Such as non-valid UTF-8 in the debug string, depth limit, etc...
+           //debug is not passed in this case, because you cannot be sure that, that was not what caused the error.
+           //Such as non-valid UTF-8 in the debug string, depth limit, etc...
            $json = json_encode(['userdata' => [
               'debug' => false,
               'error' => json_last_error_msg()

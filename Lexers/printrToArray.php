@@ -49,7 +49,7 @@ function parseTokens( array &$lexer_stream ){
         $type = $current['type'];
         //var_export($result);
         switch($type){
-            case 'T_EOF': return;
+            case 'T_EOF': return $result;
             case 'T_WHITESPACE' :
             case 'T_ARROW' :
                 next($lexer_stream);
@@ -62,11 +62,11 @@ function parseTokens( array &$lexer_stream ){
             case 'T_ARRAY_START' :
                 next($lexer_stream);
                 if(false == $key) return $result[] = parseTokens($lexer_stream);
-                else $result[$key] = parseTokens($lexer_stream);
+                else $result[$key][] = parseTokens($lexer_stream);
                 break;
             case 'T_KEY' :
                 next($lexer_stream);
-                $key = trim($content,'[]');
+                $key = (string)trim($content,'[]"');
                 break;
             case 'T_VALUE' :
                 next($lexer_stream);
@@ -90,51 +90,36 @@ function parseTokens( array &$lexer_stream ){
     trigger_error("Unclosed item $mode for $type value $content", E_USER_ERROR);
 }
 
-/*
+$result = '';
 
-
-$subject = <<<CODE
-array(2) {
-  [0]=>
-  array(2) {
-    ["id"]=>
-    string(11) "43000173601"
-    ["data"]=>
-    array(2) {
-      [0]=>
-      array(2) {
-        ["id"]=>
-        string(5) "52874"
-        ["name"]=>
-        string(3) "x70"
-      }
-      [1]=>
-      array(2) {
-        ["id"]=>
-        string(5) "52874"
-        ["name"]=>
-        string(3) "x70"
-      }
-    }
-  }
-  [1]=>
-  array(2) {
-    ["id"]=>
-    string(11) "43000173602"
-    ["data"]=>
-    array(1) {
-      [0]=>
-      array(2) {
-        ["id"]=>
-        string(5) "52874"
-        ["name"]=>
-        string(3) "x70"
-      }
-    }
-  }
+if('POST' == $_SERVER['REQUEST_METHOD']){
+    
+    
+    $result = var_export(parse($_POST['code']), true);
+    
+    
 }
-CODE;
 
-var_export( parse($subject, $tokens) );
 
- */
+
+?>
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>PrintR to VarExport</title>
+	</head>
+
+<body>
+	<form method="post" style="margin:20px; width:1000px;margin:auto;">
+		<textarea name="code" style="max-width:1000px;min-width:1000px;height:500px;"><?php echo $result;?></textarea><br>
+		<button type="submit">Convert!</button>
+	</form>
+</body>
+
+</html>
+
+
+
+<html>
+

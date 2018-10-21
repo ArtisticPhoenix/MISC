@@ -49,7 +49,7 @@ function parseTokens( array &$lexer_stream ){
         $type = $current['type'];
         //var_export($result);
         switch($type){
-            case 'T_EOF': return $result;
+            case 'T_EOF': return;
             case 'T_WHITESPACE' :
             case 'T_ARROW' :
                 next($lexer_stream);
@@ -61,12 +61,18 @@ function parseTokens( array &$lexer_stream ){
                 
             case 'T_ARRAY_START' :
                 next($lexer_stream);
-                if(false == $key) return $result[] = parseTokens($lexer_stream);
-                else $result[$key][] = parseTokens($lexer_stream);
+                //var_dump($key);
+                if(false === $key){
+                    return parseTokens($lexer_stream);
+                }else{
+                    if(!isset($result[$key])) $result[$key] = [];
+                    $result[$key] = array_merge($result[$key],parseTokens($lexer_stream));
+                }
                 break;
             case 'T_KEY' :
                 next($lexer_stream);
                 $key = (string)trim($content,'[]"');
+                //var_dump($key);
                 break;
             case 'T_VALUE' :
                 next($lexer_stream);
@@ -78,7 +84,6 @@ function parseTokens( array &$lexer_stream ){
                 break;
             case 'T_COMMA' :
             case 'T_VALUE' :
-                
             case 'T_UNKNOWN':
             default:
                 print_r($current);

@@ -313,5 +313,5 @@ final class ProcLock{
  * register our shutdown handler - if the script dies unlock the lock
  * this is superior to __destruct(), because the shutdown handler runs even in situation where PHP exhausts all memory
  */
-register_shutdown_function(array('\\Lib\\Queue\\ProcLock',"destroy"));
+register_shutdown_function(array('ProcLock',"destroy"));
 

@@ -52,8 +52,6 @@ class SimpleRouter{
             return;
         }
         
-        require_once $contollerFile;
-        
         if(!class_exists($contollerName)){
             self::error404($uri);
             return;

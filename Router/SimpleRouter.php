@@ -46,13 +46,7 @@ class SimpleRouter{
         $methodName = array_shift($arrPath);;
         $contollerFile = self::CONTOLLER_PATH.$contollerName.'.php';
         
-        if(!file_exists($contollerFile)){
-            //send to error page
-            self::error404($uri);
-            return;
-        }
-        
-        if(!class_exists($contollerName)){
+        if(!file_exists($contollerFile)||!class_exists($contollerName)){
             self::error404($uri);
             return;
         }

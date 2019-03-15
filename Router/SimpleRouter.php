@@ -46,6 +46,8 @@ class SimpleRouter{
         $methodName = array_shift($arrPath);;
         $contollerFile = self::CONTOLLER_PATH.$contollerName.'.php';
         
+        //require_once $contollerFile; //> when not autoloading, explode takes care of / in REQUEST_URI
+        
         if(!file_exists($contollerFile)||!class_exists($contollerName)){
             self::error404($uri);
             return;

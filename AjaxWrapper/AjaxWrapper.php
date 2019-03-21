@@ -85,10 +85,10 @@ class AjaxWrapper{
      * 
      */
     public static function respond(Closure $callback, $options=0, $depth=32){
-        $response = ['userdata' => [
+        $response = [
               'debug' => false,
               'error' => false
-        ]];
+        ];
 
         ob_start();
 
@@ -100,6 +100,7 @@ class AjaxWrapper{
              }
 
              $callback($response);
+              //PHP7 use Throwable
          }catch(\Exception $e){
               //example 'Exception[code:401]'
              $response['error'] = get_class($e).'[code:'.$e->getCode().']';
